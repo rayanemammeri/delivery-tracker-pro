@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon-v2.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon-v3.png'],
       manifest: {
         name: 'Delivery Tracker Pro',
         short_name: 'Livraisons',
@@ -23,9 +23,9 @@ export default defineConfig({
         background_color: '#0b0f17',
         theme_color: '#0b0f17',
         icons: [
-          { src: 'pwa-192-v2.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512-v2.png', sizes: '512x512', type: 'image/png' },
-          { src: 'pwa-512-v2.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'pwa-192-v3.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512-v3.png', sizes: '512x512', type: 'image/png' },
+          { src: 'pwa-512-v3.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
