@@ -6,7 +6,7 @@ import { breakMs, shiftSalary, workedMs } from '../lib/calc';
 import { centsToInput, formatMoney, parseMoney } from '../lib/money';
 import { buildShiftTimes, formatDuration, timeHM } from '../lib/time';
 import type { Shift } from '../lib/types';
-import { Row, Sheet, useToast } from './ui';
+import { Row, Sheet, useConfirmYesNo, useToast } from './ui';
 
 /**
  * Création / correction manuelle d'un quart : utile si on a oublié de démarrer ou d'arrêter
@@ -23,6 +23,7 @@ export function ShiftSheet({ shift, newForDate, onClose }: { shift: Shift | null
   const [rate, setRate] = useState('12,00');
   const [error, setError] = useState('');
   const toast = useToast();
+  const confirm = useConfirmYesNo();
 
   useEffect(() => {
     if (shift) {
@@ -82,7 +83,7 @@ export function ShiftSheet({ shift, newForDate, onClose }: { shift: Shift | null
   };
 
   const remove = async () => {
-    if (!shift || !window.confirm('Supprimer ce quart de travail ?')) return;
+    if (!shift || !(await confirm('Supprimer ce quart de travail ?', 'Supprimer le quart', { message: 'Le salaire de ce quart sera retiré du bilan.', danger: true }))) return;
     await deleteShift(shift.id);
     toast({ text: 'Quart supprimé', tone: 'ok' });
     onClose();

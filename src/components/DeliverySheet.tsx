@@ -65,7 +65,7 @@ export function DeliverySheet({ delivery, newForDate, onClose }: { delivery: Del
       <div className="space-y-4">
         <div>
           <label className="label" htmlFor="d-amount">Pourboire ($)</label>
-          <input id="d-amount" className="field text-2xl font-bold" inputMode="decimal" placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
+          <input id="d-amount" className="field text-2xl font-bold" inputMode="decimal" placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} data-autofocus />
         </div>
         <MethodPicker value={method} onChange={setMethod} size="md" />
         <div className="grid grid-cols-2 gap-3">

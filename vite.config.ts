@@ -12,6 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon-v3.png'],
       manifest: {
+        id: './',
         name: 'Delivery Tracker Pro',
         short_name: 'Livraisons',
         description: 'Suivi des heures, livraisons et pourboires',

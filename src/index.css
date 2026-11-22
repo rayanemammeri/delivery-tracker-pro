@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 :root {
+  /* Thème des contrôles natifs (sélecteurs de date/heure, barres de défilement) aligné sur l'app */
+  color-scheme: light;
+  accent-color: #6366f1;
   -webkit-tap-highlight-color: transparent;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -27,6 +30,73 @@ input, select, textarea { font-size: 16px; }
   .muted { @apply text-slate-500 dark:text-slate-400; }
   .section-title { @apply mb-2 mt-6 px-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400; }
 }
+:root.dark { color-scheme: dark; }
+
+/* ───── Feuilles et confirmations : <dialog> natif ───── */
+dialog.sheet, dialog.confirm {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+}
+/* :root + :modal : plus prioritaire que les utilitaires d'espacement (space-y-*) des conteneurs parents */
+:root dialog.sheet:modal { width: 100%; max-width: 32rem; margin: auto auto 0; }
+@media (min-width: 640px) { :root dialog.sheet:modal { margin: auto; } }
+:root dialog.confirm:modal { margin: auto; }
+/* Empêche la page derrière de défiler (sans toucher à overflow sur html/body) */
+dialog:modal { overscroll-behavior: contain; }
+dialog::backdrop { overflow: hidden; overscroll-behavior: contain; }
+
+/* Animations d'entrée / sortie de la couche supérieure */
+dialog.sheet, dialog.confirm {
+  opacity: 0;
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: .25s;
+  transition-timing-function: ease-out;
+  transition-behavior: allow-discrete;
+}
+dialog.sheet[open], dialog.confirm[open] { opacity: 1; transform: none; }
+@starting-style { dialog.sheet[open], dialog.confirm[open] { opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  dialog.sheet { transform: translateY(32px); }
+  dialog.confirm { transform: scale(.94); }
+  dialog.sheet[open], dialog.confirm[open] { transform: none; }
+  @starting-style {
+    dialog.sheet[open] { transform: translateY(32px); }
+    dialog.confirm[open] { transform: scale(.94); }
+  }
+}
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 0);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition-property: background-color, display, overlay;
+  transition-duration: .25s;
+  transition-behavior: allow-discrete;
+}
+dialog[open]::backdrop { background-color: rgb(0 0 0 / .5); }
+@starting-style { dialog[open]::backdrop { background-color: rgb(0 0 0 / 0); } }
+
+/* ───── Notifications : popover="manual" positionné au-dessus de la barre d'onglets ───── */
+.toast {
+  position: fixed;
+  inset: auto 16px auto 16px;
+  margin: 0 auto;
+  max-width: 28rem;
+  width: auto;
+  border: 0;
+  overflow: visible;
+  z-index: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet, dialog.confirm, dialog::backdrop { transition-duration: .1s; }
+  .animate-pop, .animate-up, .animate-pulse { animation: none !important; }
+}
+
 .pt-safe { padding-top: var(--safe-top); }
 .pb-safe { padding-bottom: var(--safe-bottom); }
 .no-scrollbar::-webkit-scrollbar { display: none; }

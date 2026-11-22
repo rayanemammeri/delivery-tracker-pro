@@ -6,7 +6,7 @@ import { centsToInput, formatMoney, parseMoney } from '../lib/money';
 import { dateKey, timeHM } from '../lib/time';
 import type { Settings as S } from '../lib/types';
 import { applyTheme } from '../lib/theme';
-import { useToast } from '../components/ui';
+import { useConfirm, useConfirmYesNo, useToast } from '../components/ui';
 
 /** Télécharge un fichier ; sur iPhone propose la feuille de partage (Enregistrer dans Fichiers / iCloud). */
 async function saveFile(name: string, content: string, type: string) {
@@ -36,6 +36,8 @@ export function Settings() {
   const [persisted, setPersisted] = useState<boolean | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
+  const ask = useConfirm();
+  const confirm = useConfirmYesNo();
 
   useEffect(() => setRate(centsToInput(settings.hourlyRate)), [settings.hourlyRate]);
   useEffect(() => {
@@ -71,8 +73,16 @@ export function Settings() {
     if (!f) return;
     try {
       const data = JSON.parse(await f.text());
-      const replace = window.confirm('Remplacer TOUTES les données actuelles par cette sauvegarde ?\n\nOK = remplacer\nAnnuler = fusionner (sans doublons)');
-      const r = await importBackup(data, replace ? 'replace' : 'merge');
+      const mode = await ask({
+        title: 'Restaurer la sauvegarde',
+        message: 'Fusionner : ajoute les données du fichier sans créer de doublons.\nRemplacer : efface les données actuelles et les remplace par celles du fichier.',
+        actions: [
+          { value: 'merge', label: 'Fusionner (recommandé)', tone: 'primary' },
+          { value: 'replace', label: 'Tout remplacer', tone: 'danger' },
+        ],
+      });
+      if (mode !== 'merge' && mode !== 'replace') return;
+      const r = await importBackup(data, mode);
       toast({ text: `Restauré : ${r.deliveries} livraisons, ${r.shifts} quarts, ${r.payouts} remises`, tone: 'ok' });
     } catch (e) {
       toast({ text: (e as Error).message || 'Fichier illisible', tone: 'error' });
@@ -149,8 +159,8 @@ export function Settings() {
       <button
         className="btn-danger w-full"
         onClick={async () => {
-          if (!window.confirm('Effacer TOUTES les données ? Cette action est irréversible.')) return;
-          if (!window.confirm('Dernière confirmation : avez-vous fait une sauvegarde ?')) return;
+          if (!(await confirm('Effacer toutes les données ?', 'Continuer', { message: 'Quarts, livraisons et remises seront supprimés de cet appareil. Cette action est irréversible.', danger: true }))) return;
+          if (!(await confirm('Dernière confirmation', 'Tout effacer', { message: 'Avez-vous créé un fichier de sauvegarde ?', danger: true }))) return;
           await wipeAll();
           toast({ text: 'Toutes les données ont été effacées', tone: 'ok' });
         }}

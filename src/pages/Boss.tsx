@@ -5,7 +5,7 @@ import { useData } from '../hooks/data';
 import { centsToInput, formatMoney, parseMoney } from '../lib/money';
 import { dateKey, formatDateLong, formatDateShort } from '../lib/time';
 import type { Payout } from '../lib/types';
-import { Empty, Sheet, Stat, useToast } from '../components/ui';
+import { Empty, Sheet, Stat, useConfirmYesNo, useToast } from '../components/ui';
 import { navigate } from '../lib/router';
 
 /**
@@ -99,6 +99,7 @@ function PayoutSheet({ open, edit, onClose }: { open: boolean; edit: Payout | nu
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
   const toast = useToast();
+  const confirm = useConfirmYesNo();
   const dueDays = [...ledger.byDay.values()].filter((d) => d.due > 0 || d.date === edit?.forDate).sort((a, b) => b.date.localeCompare(a.date));
 
   useEffect(() => {
@@ -159,7 +160,7 @@ function PayoutSheet({ open, edit, onClose }: { open: boolean; edit: Payout | nu
               className="btn-danger"
               aria-label="Supprimer la remise"
               onClick={async () => {
-                if (!window.confirm('Supprimer cette remise ?')) return;
+                if (!(await confirm('Supprimer cette remise ?', 'Supprimer la remise', { message: `${formatMoney(edit.amount)} redeviendront dus par le patron.`, danger: true }))) return;
                 await deletePayout(edit.id);
                 toast({ text: 'Remise supprimée', tone: 'ok' });
                 onClose();

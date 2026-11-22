@@ -23,8 +23,8 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ ...devices['iPhone 13'], locale: 'fr-CA', timezoneId: 'America/Toronto' });
 ctx.setDefaultTimeout(8000);
 const page = await ctx.newPage();
-page.on('dialog', (d) => d.accept());
 const errors = [];
+page.on('dialog', (d) => { errors.push('Boîte native window.confirm/alert utilisée : ' + d.message()); d.accept(); });
 page.on('pageerror', (e) => errors.push(e.message));
 
 try {
@@ -63,6 +63,13 @@ try {
   await page.waitForTimeout(300);
   assert((await page.getByTestId('tip-machine').textContent()) === '9,50 $', 'Modification : machine passe à 9,50 $');
 
+  // Feuille <dialog> : Échap la ferme sans enregistrer
+  await page.getByTestId('delivery-list').locator('li').first().click();
+  await page.getByRole('dialog', { name: 'Modifier la livraison' }).waitFor();
+  await page.keyboard.press('Escape');
+  await page.getByRole('dialog', { name: 'Modifier la livraison' }).waitFor({ state: 'hidden' });
+  assert((await page.getByTestId('tip-machine').textContent()) === '9,50 $', 'Échap ferme la feuille sans rien modifier');
+
   // Suppression
   await page.getByTestId('delivery-list').locator('li').first().click();
   await page.getByRole('button', { name: 'Supprimer' }).click();
@@ -92,13 +99,24 @@ try {
   // Fermeture complète de l'onglet puis réouverture
   await page.close();
   const page2 = await ctx.newPage();
-  page2.on('dialog', (d) => d.accept());
+  page2.on('dialog', (d) => { errors.push('Boîte native utilisée : ' + d.message()); d.accept(); });
+  page2.on('pageerror', (e) => errors.push(e.message));
   await page2.goto(URL + '#/patron');
   assert((await page2.getByTestId('boss-due').textContent()) === '2,50 $', 'Remises conservées après fermeture de l’onglet');
 
   // Terminer le travail puis bilan
   await page2.goto(URL);
+  // Confirmation native <dialog> : « Annuler » (action sûre, focus par défaut) ne termine pas le quart
   await page2.getByTestId('end-shift').click();
+  const confirmDlg = page2.getByRole('dialog', { name: 'Terminer le travail maintenant ?' });
+  await confirmDlg.waitFor();
+  assert(await confirmDlg.getByRole('button', { name: 'Annuler' }).evaluate((b) => b === document.activeElement), 'Le focus est sur « Annuler » (action sûre)');
+  await page2.keyboard.press('Escape');
+  await confirmDlg.waitFor({ state: 'hidden' });
+  await page2.getByTestId('shift-clock').waitFor();
+  assert(true, 'Échap ferme la confirmation sans terminer le quart');
+  await page2.getByTestId('end-shift').click();
+  await confirmDlg.getByRole('button', { name: 'Terminer le travail' }).click();
   await page2.getByTestId('start-shift').waitFor();
   assert(true, 'Terminer le travail');
   await page2.getByRole('button', { name: 'Bilan', exact: true }).click();

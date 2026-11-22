@@ -7,7 +7,7 @@ import { formatMoney } from '../lib/money';
 import { formatClock, formatDuration, timeFr } from '../lib/time';
 import type { Shift } from '../lib/types';
 import { ShiftSheet } from './ShiftSheet';
-import { useToast } from './ui';
+import { useConfirmYesNo, useToast } from './ui';
 
 /** Boutons COMMENCER / TERMINER LE TRAVAIL, chronomètre, pause et correction. */
 export function ShiftCard() {
@@ -15,6 +15,7 @@ export function ShiftCard() {
   const [editing, setEditing] = useState<Shift | null>(null);
   const [adding, setAdding] = useState<string | null>(null);
   const toast = useToast();
+  const confirm = useConfirmYesNo();
   const doneToday = shifts.filter((s) => s.date === today && s.end).sort((a, b) => a.start.localeCompare(b.start));
 
   if (!activeShift) {
@@ -87,7 +88,7 @@ export function ShiftCard() {
           data-testid="end-shift"
           className="btn h-14 whitespace-nowrap bg-rose-600 text-[15px] font-extrabold tracking-wide text-white"
           onClick={async () => {
-            if (!window.confirm('Terminer le travail maintenant ?')) return;
+            if (!(await confirm('Terminer le travail maintenant ?', 'Terminer le travail', { message: `Fin enregistrée à ${timeFr(new Date().toISOString())}. Vous pourrez corriger l’heure ensuite.`, danger: true }))) return;
             await endShift();
             toast({ text: 'Travail terminé — bilan disponible', tone: 'ok' });
           }}
