@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  -webkit-tap-highlight-color: transparent;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { overscroll-behavior-y: none; }
+body {
+  @apply bg-slate-50 text-slate-900 antialiased dark:bg-[#0b0f17] dark:text-slate-100;
+  font-feature-settings: 'tnum' 1;
+}
+input, select, textarea, button { font: inherit; }
+/* iOS zoome sur les champs < 16px : on garde 16px minimum */
+input, select, textarea { font-size: 16px; }
+
+@layer components {
+  .card { @apply rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/[0.06] dark:bg-[#121826] dark:shadow-none; }
+  .btn { @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 font-semibold transition active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40; min-height: 48px; }
+  .btn-primary { @apply btn bg-indigo-600 text-white hover:bg-indigo-500; }
+  .btn-ghost { @apply btn bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-white/[0.06] dark:text-slate-100 dark:hover:bg-white/10; }
+  .btn-danger { @apply btn bg-rose-600 text-white hover:bg-rose-500; }
+  .field { @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-white/10 dark:bg-[#0b0f17] dark:text-slate-100; min-height: 48px; }
+  .label { @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400; }
+  .muted { @apply text-slate-500 dark:text-slate-400; }
+  .section-title { @apply mb-2 mt-6 px-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400; }
+}
+.pt-safe { padding-top: var(--safe-top); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
