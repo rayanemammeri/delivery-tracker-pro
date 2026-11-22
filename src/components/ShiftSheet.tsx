@@ -96,7 +96,7 @@ export function ShiftSheet({ shift, newForDate, onClose }: { shift: Shift | null
           <label className="label" htmlFor="s-date">Journée de travail</label>
           <input id="s-date" type="date" className="field" value={date} onChange={(e) => setDate(e.target.value)} />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <label className="label" htmlFor="s-start">Début</label>
             <input id="s-start" type="time" className="field" value={start} onChange={(e) => setStart(e.target.value)} />
@@ -111,7 +111,7 @@ export function ShiftSheet({ shift, newForDate, onClose }: { shift: Shift | null
             <input type="checkbox" className="h-5 w-5" checked={ongoing} onChange={(e) => setOngoing(e.target.checked)} /> Quart toujours en cours
           </label>
         )}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <label className="label" htmlFor="s-pause">Pause non payée (min)</label>
             <input id="s-pause" className="field" inputMode="numeric" value={pause} onChange={(e) => setPause(e.target.value.replace(/\D/g, ''))} />

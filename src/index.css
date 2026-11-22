@@ -97,6 +97,17 @@ dialog[open]::backdrop { background-color: rgb(0 0 0 / .5); }
   .animate-pop, .animate-up, .animate-pulse { animation: none !important; }
 }
 
+/* Safari iOS donne une largeur minimale aux champs date/heure : ils débordaient de leur colonne. */
+input[type="date"], input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value { text-align: left; }
+
 .pt-safe { padding-top: var(--safe-top); }
 .pb-safe { padding-bottom: var(--safe-bottom); }
 .no-scrollbar::-webkit-scrollbar { display: none; }

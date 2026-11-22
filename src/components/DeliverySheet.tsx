@@ -68,7 +68,7 @@ export function DeliverySheet({ delivery, newForDate, onClose }: { delivery: Del
           <input id="d-amount" className="field text-2xl font-bold" inputMode="decimal" placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} data-autofocus />
         </div>
         <MethodPicker value={method} onChange={setMethod} size="md" />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 [&>*]:min-w-0">
           <div>
             <label className="label" htmlFor="d-date">Journée</label>
             <input id="d-date" type="date" className="field" value={date} onChange={(e) => setDate(e.target.value)} />
